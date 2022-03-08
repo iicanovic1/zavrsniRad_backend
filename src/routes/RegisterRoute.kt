@@ -17,8 +17,8 @@ fun Route.registerRoute (){
     route("/register"){
         post{
             val request = try {
-                call.receive<AccountRequest>()
-            }catch (e: ContentTransformationException){
+                call.receive<AccountRequest>() // zaprima tijelo zahtjeva i ubacuje iz Json u AccountRequest
+            }catch (e: ContentTransformationException){// ako je pogrešan format zahtjeva
                 call.respond(BadRequest)
                 return@post
             }
@@ -28,7 +28,6 @@ fun Route.registerRoute (){
                     call.respond(OK,SimpleResponse(true,"Successfuly created account!"))
                 }else{
                     call.respond(OK,SimpleResponse(false,"Unknown error ocured!"))
-
                 }
             }else{
                 call.respond(OK,SimpleResponse(false,"A user with that emailalready exists!"))

@@ -1,9 +1,12 @@
 package ba.unsa.etf.zavrsniRad
 
+import ba.unsa.etf.zavrsniRad.data.checkPasswordForEmail
 import ba.unsa.etf.zavrsniRad.data.collections.User
 import ba.unsa.etf.zavrsniRad.data.registerUser
+import ba.unsa.etf.zavrsniRad.routes.loginRoute
 import ba.unsa.etf.zavrsniRad.routes.registerRoute
 import io.ktor.application.*
+import io.ktor.auth.*
 import io.ktor.features.*
 import io.ktor.gson.*
 import io.ktor.response.*
@@ -23,15 +26,18 @@ fun Application.module(testing: Boolean = false) {
     install(CallLogging)
     install(Routing){
         registerRoute()
+        loginRoute()
     }
     install(ContentNegotiation) {
         gson {
             setPrettyPrinting()
         }
     }
+    install(Authentication){
+        configureAuth()
+    }
 
-
-
+    // Registracija korinsika prilikom pokretanja servera u svrhe testiranja
     /*
     CoroutineScope(Dispatchers.IO).launch{
         registerUser(
@@ -41,8 +47,19 @@ fun Application.module(testing: Boolean = false) {
             )
         )
     }
-
-     */
+    */
 
 }
 
+private fun Authentication.Configuration.configureAuth(){
+    basic {
+        realm = "Note Server"
+        validate { credentials ->
+            val email = credentials.name
+            val password = credentials.password
+            if(checkPasswordForEmail(email,password)){
+                UserIdPrincipal(email)
+            }else null
+        }
+    }
+}

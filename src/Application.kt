@@ -4,6 +4,7 @@ import ba.unsa.etf.zavrsniRad.data.checkPasswordForEmail
 import ba.unsa.etf.zavrsniRad.data.collections.User
 import ba.unsa.etf.zavrsniRad.data.registerUser
 import ba.unsa.etf.zavrsniRad.routes.loginRoute
+import ba.unsa.etf.zavrsniRad.routes.noteRoutes
 import ba.unsa.etf.zavrsniRad.routes.registerRoute
 import io.ktor.application.*
 import io.ktor.auth.*
@@ -22,21 +23,21 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
+    install(Authentication){
+        configureAuth()
+    }
     install(DefaultHeaders)
     install(CallLogging)
-    install(Routing){
-        registerRoute()
-        loginRoute()
-    }
     install(ContentNegotiation) {
         gson {
             setPrettyPrinting()
         }
     }
-    install(Authentication){
-        configureAuth()
+    install(Routing){
+        registerRoute()
+        loginRoute()
+        noteRoutes()
     }
-
     // Registracija korinsika prilikom pokretanja servera u svrhe testiranja
     /*
     CoroutineScope(Dispatchers.IO).launch{
